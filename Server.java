@@ -14,6 +14,7 @@ public class Server extends Thread{
     List<Integer> indices;
     Set<String> memberNames = new HashSet<>();
     Set<Member> members = new HashSet<>();
+    int round;
  
     public Server(int port, int numOfPlayers){
         this.rand = new Random();
@@ -24,6 +25,7 @@ public class Server extends Thread{
         this.someoneFinished = false;
         this.joinID = 1;
         this.finishNumber = 0;
+        this.round = 1;
 
         for(i = 0; i < numOfPlayers; i++){
             String card;
@@ -147,6 +149,16 @@ public class Server extends Thread{
                     this.broadcastToAll("All players have passed cards");
 
                     this.rotateCards();
+
+                    System.out.println("Round: " + this.round++);
+                    this.members.forEach(x -> {
+                        System.out.println(x.memberName + ":");
+                        for(i = 0; i < 4; i++){
+                            System.out.print(x.cards[i] + " ");
+                        }
+                        System.out.println();
+                    });
+                    System.out.println("--------------------");
 
                     this.members.forEach(x -> {
                         x.write.println("Your cards:");

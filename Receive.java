@@ -23,7 +23,7 @@ public class Receive extends Thread{
                 System.out.println("\n" + reply);
  
                 if(client.memberName != null){
-                    System.out.print(client.memberName + ": ");
+                    System.out.print("");
                 }
             }catch(Exception e){
                 break;

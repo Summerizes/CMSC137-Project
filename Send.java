@@ -37,7 +37,7 @@ public class Send extends Thread{
         String message;
  
         do{
-            message = console.readLine(memberName + ": ");
+            message = console.readLine("");
             write.println(message);
  
         }while(!message.equals("exit"));

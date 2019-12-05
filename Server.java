@@ -26,7 +26,26 @@ public class Server extends Thread{
         this.finishNumber = 0;
 
         for(i = 0; i < numOfPlayers; i++){
-            String card = Integer.toString(i + 1);
+            String card;
+
+            if(i == 0){
+            	card = "A";
+            }
+            else if(i == 9){
+            	card = "T";
+            }
+            else if(i == 10){
+            	card = "J";
+            }
+            else if(i == 11){
+            	card = "Q";
+            }
+            else if(i == 12){
+            	card = "K";
+            }
+            else{
+            	card = Integer.toString(i + 1);
+            }
             for(j = 0; j < 4; j++){
                 if(j == 0){
                     card = card + "S";
@@ -42,7 +61,25 @@ public class Server extends Thread{
                 }
 
                 cards[i * 4 + j] = card;
-                card = Integer.toString(i + 1);
+
+                if(i == 0){
+	            	card = "A";
+	            }
+	            else if(i == 9){
+	            	card = "T";
+	            }
+	            else if(i == 10){
+	            	card = "J";
+	            }
+	            else if(i == 11){
+	            	card = "Q";
+	            }
+	            else if(i == 12){
+	            	card = "K";
+	            }
+	            else{
+	            	card = Integer.toString(i + 1);
+	            }
             }
         }
     }
@@ -50,10 +87,6 @@ public class Server extends Thread{
     public void run(){
         try(ServerSocket serverSocket = new ServerSocket(port)){
             System.out.println("Server on port " + port);
-
-            // for(i = 0; i < 4 * this.numOfPlayers; i++){
-            //     System.out.println(this.cards[i]);
-            // }
 
             while(members.size() < numOfPlayers){
                 Socket socket = serverSocket.accept();
@@ -63,7 +96,6 @@ public class Server extends Thread{
                 this.giveCards(member);
                 members.add(member);
                 member.start();
-                // System.out.println(memberNames.size());
             }
 
             while(memberNames.size() < numOfPlayers){
@@ -80,9 +112,6 @@ public class Server extends Thread{
 
             this.members.forEach(x -> {
                 x.write.println("Members and ID's:");
-                // for(i = 0; i < numOfPlayers; i++){
-                //     x.write.print(memberNames.toArray()[i] + "-0" + Integer.toString(i + 1) + " ");
-                // }
 
                 for(i = 0; i < numOfPlayers; i++){
                     for(Member y : this.members){
@@ -136,9 +165,14 @@ public class Server extends Thread{
         try{
             int port = Integer.parseInt(args[0]);
             int numOfPlayers = Integer.parseInt(args[1]);
- 
-            Server server = new Server(port, numOfPlayers);
-            server.start();
+ 			
+ 			if(numOfPlayers < 3 || numOfPlayers > 13){
+ 				System.out.println("3-13 players only!");
+ 			}
+ 			else{
+            	Server server = new Server(port, numOfPlayers);
+            	server.start();
+            }
         }catch(Exception e){
             System.out.println("Usage: java Server <port-no.> <num. of players>\n"+"Make sure to use valid ports (greater than 1023)");
         }
@@ -148,7 +182,7 @@ public class Server extends Thread{
         boolean isRemoved = memberNames.remove(memberName);
         if(isRemoved == true){
             members.remove(member);
-            System.out.println(memberName + " has left the conversation.");
+            System.out.println(memberName + " has left the game.");
         }
     }
 
@@ -197,12 +231,6 @@ public class Server extends Thread{
     boolean haveAllMembersPassed(){
         boolean returnVal = true;
 
-        // members.forEach(x -> {
-        //     if(x.passed == false){
-        //         returnVal = false;
-        //     }
-        // });
-
         for(Member x : this.members){
             if(x.passed == false){
                 returnVal = false;
@@ -213,12 +241,8 @@ public class Server extends Thread{
     }
 
     void conclude(){
-        // int i = 0, winnerIndex = 0, loserIndex = 0;
-
-        // this.broadcastToAll("Winner's cards: ");
         for(Member x : this.members){
             if(x.finishNumber == 0){
-                // winnerIndex = i;
                 this.broadcastToAll("Winner: " + x.memberName);
                 this.members.forEach(y -> {
                     y.write.println("Winning card combination:");
@@ -229,33 +253,15 @@ public class Server extends Thread{
                 });
             }
             else if(x.finishNumber == this.numOfPlayers - 1){
-                // loserIndex = i;
                 this.broadcastToAll("Loser: " + x.memberName);
             }
-            // i++;
         }
-
-        // this.broadcastToAll("Winner: " + this.memberNames.toArray()[winnerIndex]);
-        // this.broadcastToAll("Loser: " + this.memberNames.toArray()[loserIndex]);
     }
 
     void rotateCards(){
-        // Set<String> passMessages = new HashSet<>();
-        // Set<String[]> userSetOfCards = new HashSet<>();
-
         String[] passMessages = new String[numOfPlayers];
         String[][] userSetOfCards = new String[numOfPlayers][4];
         int c, d;
-
-        // c = 0;
-        // for(Member x : this.members){
-        //     passMessages[c] = x.clientMessage;
-        //     for(d = 0; d < 4; d++){
-        //         userSetOfCards[c][d] = x.cards[d];
-        //     }
-
-        //     c++;
-        // }
 
         for(c = 0; c < numOfPlayers; c++){
             for(Member x : this.members){
@@ -269,15 +275,14 @@ public class Server extends Thread{
         }
 
         for(c = 0; c < numOfPlayers; c++){
-            String cardToReplace = passMessages[c].substring(4, 6);
+            String cardToReplace = passMessages[c];
             String replacementCard;
-            // int index;
 
             if(c == 0){
-                replacementCard = passMessages[numOfPlayers - 1].substring(4, 6);
+                replacementCard = passMessages[numOfPlayers - 1];
             }
             else{
-                replacementCard = passMessages[c - 1].substring(4, 6);
+                replacementCard = passMessages[c - 1];
             }
 
             for(d = 0; d < 4; d++){
@@ -286,15 +291,6 @@ public class Server extends Thread{
                 }
             }
         }
-
-        // c = 0;
-        // for(Member x : this.members){
-        //     for(d = 0; d < 4; d++){
-        //         x.cards[d] = userSetOfCards[c][d];
-        //     }
-
-        //     c++;
-        // }
 
         for(c = 0; c < numOfPlayers; c++){
             for(Member x : this.members){
@@ -306,9 +302,5 @@ public class Server extends Thread{
                 }
             }
         }
-
-        // for(Member x : this.members){
-        //     x.passed = false;
-        // }
     }
 }

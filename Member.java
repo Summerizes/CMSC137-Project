@@ -31,35 +31,36 @@ public class Member extends Thread{
             memberName = read.readLine();
             server.memberNames.add(memberName);
  
-            String serverMessage = memberName + " has joined the conversation.";
+            String serverMessage = memberName + " has joined the game.";
             server.broadcast(serverMessage, this);
  
             do{
                 clientMessage = read.readLine();
-                // serverMessage = memberName + ": " + clientMessage;
-                // server.broadcast(serverMessage, this);
                 if(clientMessage != "exit"){
                     if(clientMessage.equals("finish")){
-                        if(this.checkCards() == true){
-                            this.finishNumber = this.server.finishNumber++;
-                            // write.println("FN: " + finishNumber);
-                            this.server.broadcast("Someone is finished! Type 'hand' to put hand in the table!", this);
-                            this.server.someoneFinished = true;
+                    	if(this.server.someoneFinished == false){
+                    		if(this.checkCards() == true){
+	                            this.finishNumber = this.server.finishNumber++;
+	                            this.server.someoneFinished = true;
+	                            this.server.broadcast("Someone is finished! Type 'hand' to put hand in the table!", this);
 
-                            for(Member x : this.server.members){
-                                if(x != this){
-                                    x.passed = false;
-                                }
-                            }
-                            this.passed = true;
-                        }else{
-                            write.println("Error: Your cards are not matching");
-                        }
+	                            for(Member x : this.server.members){
+	                                if(x != this){
+	                                    x.passed = false;
+	                                }
+	                            }
+	                            this.passed = true;
+	                        }else{
+	                            write.println("Error: Your cards are not matching");
+	                        }
+                    	}
+                    	else{
+                    		write.println("Someone is already finished! Type 'hand' to put hand in the table!");
+                    	}
                     }
                     else if(clientMessage.equals("hand")){
                         if(this.server.someoneFinished == true){
                             this.finishNumber = this.server.finishNumber++;
-                            // write.println("FN: " + finishNumber);
                             this.passed = true;
                         }
                     }
@@ -80,7 +81,7 @@ public class Member extends Thread{
             server.removeMember(memberName, this);
             socket.close();
  
-            serverMessage = memberName + " has left the conversation.";
+            serverMessage = memberName + " has left the game.";
             server.broadcast(serverMessage, this);
  
         }catch(Exception e){}
@@ -97,8 +98,8 @@ public class Member extends Thread{
     public boolean checkValidityMessage(String message){
         int i;
 
-        if(message.length() == 6){
-            String cardFromMessage = message.substring(4, 6);
+        if(message.length() == 2){
+            String cardFromMessage = message;
             for(i = 0; i < 4; i++){
                 if(cards[i].equals(cardFromMessage)){
                     break;
